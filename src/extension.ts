@@ -145,13 +145,14 @@ function findNearestToken(value: number): string {
   return nearestToken;
 }
 
-function findExactToken(hexColor: string): string | undefined {
+function findExactToken(hexColor: string): string[] {
+  const matchingTokens: string[] = [];
   for (const [token, tokenColor] of colorTokens) {
     if (tokenColor.toLowerCase() === hexColor.toLowerCase()) {
-      return token;
+      matchingTokens.push(token);
     }
   }
-  return undefined;
+  return matchingTokens;
 }
 
 function handleSpacingValue(
@@ -201,9 +202,13 @@ function handleColorValue(
   const endPosition = startPosition.translate(0, match[0].length);
   const range = new vscode.Range(startPosition, endPosition);
 
-  const recommendation = findExactToken(colorValue);
-  if (recommendation) {
-    const message = `DESIGN SYSTEM: Consider using '${recommendation}' instead of '${colorValue}'.`;
+  const matchingTokens = findExactToken(colorValue);
+  if (matchingTokens.length > 0) {
+    const recommendedToken = matchingTokens[0];
+    const alternatives = matchingTokens.slice(1);
+    const alternativeText =
+      alternatives.length > 0 ? `ALTERNATIVES: ${alternatives.join(", ")}` : "";
+    const message = `DESIGN SYSTEM: Consider using '${recommendedToken}' instead of '${colorValue}'.\n${alternativeText}`;
 
     diagnostics.push(
       new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning)
@@ -212,7 +217,7 @@ function handleColorValue(
       range,
       renderOptions: {
         after: {
-          contentText: ` ⟶ ${recommendation}`,
+          contentText: ` ⟶ ${recommendedToken}`,
         },
       },
     };
@@ -250,9 +255,8 @@ function lintDocument(document: vscode.TextDocument) {
 
   // Match spacing values in px
   const spacingRegex = /([\w-]+)\s*:\s*([\d\s]*(?:\d+px\b\s*)+)/g;
-  // Match hex and rgba color values
-  const colorRegex =
-    /([\w-]+)\s*:\s*(#[0-9a-fA-F]{3,8}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*(?:,\s*[\d.]+)?\s*\))/g;
+  // Match hex color values
+  const colorRegex = /([\w-]+)\s*:\s*(#[0-9a-fA-F]{3,8})/g;
 
   let match: RegExpExecArray | null;
 

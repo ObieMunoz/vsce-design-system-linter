@@ -112,12 +112,3 @@ This extension assumes that you are using a design system that has tokens matchi
 You can enable or disable the extension by clicking on the "Tokens" button in the status bar.
 
 ## Known Issues
-## Release Notes
-### 0.1.2
-Implemented color tokens
-
-### 0.1.1
-Updated changelog
-
-### 0.1.0
-Initial release of Token Recommendations

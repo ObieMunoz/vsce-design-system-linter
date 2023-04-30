@@ -2,7 +2,9 @@
 
 All notable changes to the "Token Recommendations" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.1.4]
+- Updated color regex
+- Color token tooltip will now provide a list of all matching options
 
 ## [0.1.3]
 - Updated README.md; Hex color tokens were being displayed as links erroneously.
