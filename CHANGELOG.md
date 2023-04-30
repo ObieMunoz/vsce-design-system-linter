@@ -2,6 +2,9 @@
 
 All notable changes to the "Token Recommendations" extension will be documented in this file.
 
+### [0.1.7]
+- Support for fuzzy matching of color tokens
+
 ### [0.1.6]
 - Unsupported color token warnings
 

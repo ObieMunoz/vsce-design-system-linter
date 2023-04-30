@@ -109,10 +109,10 @@ This extension assumes that you are using a design system that has tokens matchi
 - "$color-support-success-light", "#d8ecb6"
 
 ##### Unsupported hex colors
-Unsupported hex colors that are utilized will result in the message: _"⛝ Unsupported: No matching token"_
-The tooltip will also suggest utilizing a supported color token.
+Unsupported hex colors that are utilized will result in the message: _"⛝ Unsupported. Best match: ${nearestToken}"_
 
 ## Extension Settings
 You can enable or disable the extension by clicking on the "Tokens" button in the status bar.
 
 ## Known Issues
+No known issues.
