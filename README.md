@@ -1,6 +1,9 @@
 # Token Recommendations
 This tool provides warning messages and visual cues to help you use the correct tokens in your code as you type, as opposed to having to look them up in design system documentation.
 
+## Requirements
+This extension assumes that you are using a design system that has tokens matching those listed below.
+
 ## Features
 ### Tokens utilized
 #### Spacing Tokens
