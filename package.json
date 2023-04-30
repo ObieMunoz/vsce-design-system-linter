@@ -456,7 +456,7 @@
     },
     "commands": {
       "command": "design-system-linter.resetConfiguration",
-      "title": "Reset Design System Linter Configuration"
+      "title": "Design System Linter: Reset Token Configuration"
     }
   },
   "scripts": {
