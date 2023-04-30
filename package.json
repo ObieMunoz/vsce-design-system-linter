@@ -179,7 +179,7 @@
               77.5
             ]
           ],
-          "description": "Default spacing tokens for the linter."
+          "description": "Default spacing tokens for the linter. If these are modified, a reload of the extension is required."
         },
         "design-system-linter.defaultColorTokens": {
           "type": "array",
@@ -450,7 +450,7 @@
               "#d8ecb6"
             ]
           ],
-          "description": "Default color tokens for the linter."
+          "description": "Default color tokens for the linter. If these are modified, a reload of the extension is required."
         }
       }
     },
