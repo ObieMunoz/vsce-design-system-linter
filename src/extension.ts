@@ -182,7 +182,7 @@ function handleSpacingValue(
       range,
       renderOptions: {
         after: {
-          contentText: ` ⟶ ${recommendation}`,
+          contentText: ` ⮀ ${recommendation}`,
         },
       },
     };
@@ -197,7 +197,12 @@ function handleColorValue(
   diagnostics: vscode.Diagnostic[],
   decorations: vscode.DecorationOptions[]
 ) {
-  const colorValue = match[2].trim();
+  let colorValue = match[2].trim();
+
+  if (colorValue.length === 4) {
+    colorValue = `#${colorValue[1]}${colorValue[1]}${colorValue[2]}${colorValue[2]}${colorValue[3]}${colorValue[3]}`;
+  }
+
   const startPosition = document.positionAt(match.index ?? 0);
   const endPosition = startPosition.translate(0, match[0].length);
   const range = new vscode.Range(startPosition, endPosition);
@@ -217,7 +222,7 @@ function handleColorValue(
       range,
       renderOptions: {
         after: {
-          contentText: ` ⟶ ${recommendedToken}`,
+          contentText: ` ⮀ ${recommendedToken}`,
         },
       },
     };
