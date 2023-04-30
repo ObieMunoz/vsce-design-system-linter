@@ -1,7 +1,11 @@
 {
   "name": "token-recommendations",
   "displayName": "Token Recommendations",
-  "description": "VS Code extension that provides token recommendations for hardcoded pixel values.",
+  "description": "VS Code extension that provides token recommendations for hardcoded values.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ObieMunoz/vsce-token-recommendations"
+  },
   "version": "0.1.0",
   "engines": {
     "vscode": "^1.63.0"
