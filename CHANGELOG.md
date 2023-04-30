@@ -4,8 +4,8 @@ All notable changes to the "Token Recommendations" extension will be documented 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [1.0.1]
+## [0.1.1]
 - Updated changelog
 
-## [1.0]
+## [0.1.0]
 - Initial release
