@@ -1,6 +1,7 @@
 {
   "name": "token-recommendations",
   "displayName": "Token Recommendations",
+  "publisher": "ObieMunoz",
   "description": "VS Code extension that provides token recommendations for hardcoded values.",
   "repository": {
     "type": "git",
