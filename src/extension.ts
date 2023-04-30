@@ -228,6 +228,21 @@ function handleColorValue(
     };
 
     decorations.push(decoration);
+  } else {
+    const message = `DESIGN SYSTEM: Consider using a token instead of '${colorValue}'.`;
+    diagnostics.push(
+      new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning)
+    );
+    const decoration: vscode.DecorationOptions = {
+      range,
+      renderOptions: {
+        after: {
+          contentText: ` ⛝ Unsupported: No matching token`,
+        },
+      },
+    };
+
+    decorations.push(decoration);
   }
 }
 
