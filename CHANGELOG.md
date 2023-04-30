@@ -1,6 +1,11 @@
 # Change Log
 
-All notable changes to the "Token Recommendations" extension will be documented in this file.
+All notable changes to the "Design System Linter" extension will be documented in this file.
+
+### [0.1.8]
+- Updated name to "Design System Linter"
+- Added configuration support to override tokens
+- Added reset command to reset configuration to default values
 
 ### [0.1.7]
 - Support for fuzzy matching of color tokens
