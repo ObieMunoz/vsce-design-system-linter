@@ -5,7 +5,7 @@
   "description": "Design System Linter is a VSCode extension that enforces design system consistency by providing visual cues and warnings for correct token usage. Streamline your development process by reducing the need to reference design system documentation and ensuring adherence to your project's design guidelines.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ObieMunoz/vsce-token-recommendations"
+    "url": "https://github.com/ObieMunoz/vsce-design-system-tokens"
   },
   "version": "0.1.8",
   "engines": {
