@@ -2,6 +2,9 @@
 
 All notable changes to the "Design System Linter" extension will be documented in this file.
 
+### [0.1.9]
+- Minor updates to configuration and package files
+
 ### [0.1.8]
 - Updated name to "Design System Linter"
 - Added configuration support to override tokens
