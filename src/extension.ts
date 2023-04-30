@@ -107,7 +107,11 @@ const colorTokens: [string, string][] = [
 let isEnabled = true;
 let statusBarItem: vscode.StatusBarItem;
 
-function toggleTokens() {
+/**
+ * @description Activates the extension
+ * @returns {void}
+ */
+function toggleTokens(): void {
   isEnabled = !isEnabled;
   statusBarItem.text = isEnabled ? "+Tokens" : "-Tokens";
 
@@ -120,7 +124,11 @@ function toggleTokens() {
   }
 }
 
-function clearRecommendations() {
+/**
+ * @description Clears all recommendations
+ * @returns {void}
+ */
+function clearRecommendations(): void {
   diagnosticCollection.clear();
   const activeTextEditor = vscode.window.activeTextEditor;
   if (activeTextEditor) {
@@ -128,7 +136,12 @@ function clearRecommendations() {
   }
 }
 
-function findNearestToken(value: number): string {
+/**
+ * @description Lints the given document for token recommendations
+ * @param {number} value
+ * @returns {string} The nearest token to the given value
+ */
+function findNearestSpacingToken(value: number): string {
   let minDiff = Number.MAX_VALUE;
   let nearestToken = "";
 
@@ -145,7 +158,12 @@ function findNearestToken(value: number): string {
   return nearestToken;
 }
 
-function findExactToken(hexColor: string): string[] {
+/**
+ * @description Accepts a hex color string and returns a list of matching tokens
+ * @param {string} hexColor
+ * @returns {string[]} A list of matching tokens
+ */
+function findExactColorToken(hexColor: string): string[] {
   const matchingTokens: string[] = [];
   for (const [token, tokenColor] of colorTokens) {
     if (tokenColor.toLowerCase() === hexColor.toLowerCase()) {
@@ -155,12 +173,87 @@ function findExactToken(hexColor: string): string[] {
   return matchingTokens;
 }
 
+/**
+ * @description Converts a hex color string to an RGB array
+ * @param {string} hex
+ * @returns {[number, number, number] | null} An RGB array or null if the hex string is invalid
+ */
+function hexToRgb(hex: string): [number, number, number] | null {
+  const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  hex = hex.replace(shorthandRegex, (m, r, g, b) => {
+    return r + r + g + g + b + b;
+  });
+
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16),
+      ]
+    : null;
+}
+
+/**
+ * @description Calculates the distance between two colors
+ * @param {number[]} color1 {r, g, b}
+ * @param {number[]} color2 {r, g, b}
+ * @returns {number} The distance between the two colors
+ */
+function colorDistance(
+  color1: [number, number, number],
+  color2: [number, number, number]
+): number {
+  const rDiff = color1[0] - color2[0];
+  const gDiff = color1[1] - color2[1];
+  const bDiff = color1[2] - color2[2];
+  return Math.sqrt(rDiff * rDiff + gDiff * gDiff + bDiff * bDiff);
+}
+
+/**
+ * @description Accepts a hex color string and returns a fuzzy match to the nearest token
+ * @param {string} hexColor
+ * @returns {string} The nearest token to the given color
+ */
+function findClosestColorToken(hexColor: string): string {
+  const inputColor = hexToRgb(hexColor);
+  if (!inputColor) {
+    return "";
+  }
+
+  let minDistance = Number.MAX_VALUE;
+  let closestToken = "";
+
+  for (const [token, tokenColor] of colorTokens) {
+    const tokenColorRgb = hexToRgb(tokenColor);
+    if (!tokenColorRgb) {
+      continue;
+    }
+
+    const distance = colorDistance(inputColor, tokenColorRgb);
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestToken = token;
+    }
+  }
+
+  return closestToken;
+}
+
+/**
+ * @description A function that is called for each match of the spacing regex, used to create recommendations
+ * @param {RegExpExecArray} match
+ * @param {vscode.TextDocument} document
+ * @param {vscode.Diagnostic[]} diagnostics
+ * @param {vscode.DecorationOptions[]} decorations
+ * @returns {void}
+ */
 function handleSpacingValue(
   match: RegExpExecArray,
   document: vscode.TextDocument,
   diagnostics: vscode.Diagnostic[],
   decorations: vscode.DecorationOptions[]
-) {
+): void {
   const pxValueString = match[2].trim();
   const pxValues = pxValueString.match(/(\d+)px/g) || [];
 
@@ -172,7 +265,7 @@ function handleSpacingValue(
     const endPosition = startPosition.translate(0, pxValue.length);
     const range = new vscode.Range(startPosition, endPosition);
 
-    const recommendation = findNearestToken(value / 16);
+    const recommendation = findNearestSpacingToken(value / 16);
     const message = `DESIGN SYSTEM: Consider using '${recommendation}' instead of '${pxValue}'.`;
 
     diagnostics.push(
@@ -191,12 +284,20 @@ function handleSpacingValue(
   });
 }
 
+/**
+ * @description A function that is called for each match of the color regex, used to create recommendations
+ * @param {RegExpExecArray} match
+ * @param {vscode.TextDocument} document
+ * @param {vscode.Diagnostic[]} diagnostics
+ * @param {vscode.DecorationOptions[]} decorations
+ * @returns {void}
+ */
 function handleColorValue(
   match: RegExpExecArray,
   document: vscode.TextDocument,
   diagnostics: vscode.Diagnostic[],
   decorations: vscode.DecorationOptions[]
-) {
+): void {
   let colorValue = match[2].trim();
 
   if (colorValue.length === 4) {
@@ -207,7 +308,7 @@ function handleColorValue(
   const endPosition = startPosition.translate(0, match[0].length);
   const range = new vscode.Range(startPosition, endPosition);
 
-  const matchingTokens = findExactToken(colorValue);
+  const matchingTokens = findExactColorToken(colorValue);
   if (matchingTokens.length > 0) {
     const recommendedToken = matchingTokens[0];
     const alternatives = matchingTokens.slice(1);
@@ -229,6 +330,7 @@ function handleColorValue(
 
     decorations.push(decoration);
   } else {
+    const nearestToken = findClosestColorToken(colorValue);
     const message = `DESIGN SYSTEM: Consider using a token instead of '${colorValue}'.`;
     diagnostics.push(
       new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning)
@@ -237,7 +339,7 @@ function handleColorValue(
       range,
       renderOptions: {
         after: {
-          contentText: ` ⛝ Unsupported: No matching token`,
+          contentText: ` ⛝ Unsupported. Best match: ${nearestToken}`,
         },
       },
     };
@@ -255,7 +357,12 @@ const recommendationDecorationType =
     },
   });
 
-function lintDocument(document: vscode.TextDocument) {
+/**
+ * @description A linting function that performs regex matches on the document and calls the appropriate handler
+ * @param {vscode.TextDocument} document
+ * @returns {void}
+ */
+function lintDocument(document: vscode.TextDocument): void {
   if (!isEnabled) {
     return;
   }
@@ -297,7 +404,12 @@ function lintDocument(document: vscode.TextDocument) {
   }
 }
 
-export function activate(context: vscode.ExtensionContext) {
+/**
+ * @description A function that is called when the extension is activated
+ * @param {vscode.ExtensionContext} context
+ * @returns {void}
+ */
+export function activate(context: vscode.ExtensionContext): void {
   diagnosticCollection = vscode.languages.createDiagnosticCollection(
     "tokenRecommendations"
   );
