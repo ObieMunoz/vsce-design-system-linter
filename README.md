@@ -12,8 +12,9 @@ To change the design system:
 1. Option 1: Open your VS Code Preferences and navigate to `Extensions` > `Design System Linter` > `Design System`. Once here, select the design system you would like to use.
 2. Option 2: Manually update the `designSystem` option in your `settings.json` file. The available options are:
 
-- "default": The built-in default design system
-- "custom": Use a custom design system defined in your `settings.json`
+- "Default": The built-in default design system
+- "IBM Carbon": The IBM Carbon Design System
+- "Custom": Use a custom design system defined in your `settings.json`
 
 ### Token Warnings
 
