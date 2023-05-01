@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/ObieMunoz/vsce-design-system-tokens"
   },
-  "version": "0.1.10",
+  "version": "0.1.11",
   "engines": {
     "vscode": "^1.63.0"
   },
@@ -114,8 +114,10 @@
       "@typescript-eslint/eslint-plugin": "^5.3.0",
       "@typescript-eslint/parser": "^5.3.0",
       "eslint": "^8.3.0",
-      "typescript": "^5.0.4",
-      "vscode": "^1.1.37"
+      "typescript": "^5.0.4"
     }
+  },
+  "devDependencies": {
+    "vscode": "^1.1.37"
   }
 }

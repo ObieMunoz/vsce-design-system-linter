@@ -2,6 +2,9 @@
 
 All notable changes to the "Design System Linter" extension will be documented in this file.
 
+### [0.1.11]
+- Resolved an error that was including extraneous files in the extension package.
+
 ### [0.1.10]
 #### Added
 - Added `designSystem` setting to allow users to select a predefined design system or use a custom design system.
