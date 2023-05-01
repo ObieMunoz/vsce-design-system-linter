@@ -31,7 +31,7 @@ To use a different design system or define custom tokens, follow these steps:
 
 1. Navigate to `Preferences` > `Extensions` > `Design System Linter`.
 2. Under the "Design System" option, select one of the predefined design systems or choose "Custom".
-3. If you selected "Custom", click "Edit in settings.json" next to the "Custom Design System" option.
+3. If you selected "Custom", click "Edit in settings.json" next to the custom token options.
 4. Define your custom tokens in the settings.json file using the following format:
 
 ```json
