@@ -14,22 +14,21 @@ let colorTokens: [string, string][];
  * @returns {Promise<void>}
  */
 async function loadDesignSystem(system: string): Promise<void> {
-  try {
-    switch (system) {
-      case "default":
-        const designSystem = await import("./design-systems/default.json");
-        tokens = Object.entries(designSystem.default.spacing);
-        colorTokens = Object.entries(designSystem.default.colors);
-        break;
-      case "custom":
-        tokens = config.get<[string, number][]>("customSpacingTokens") || [];
-        colorTokens = config.get<[string, string][]>("customColorTokens") || [];
-        break;
-      default:
-        throw new Error(`Unsupported design system: ${system}`);
-    }
-  } catch (error: any) {
-    throw new Error(error);
+  switch (system) {
+    case "IBM Carbon":
+      const ibmCarbon = await import("./design-systems/ibmcarbon.json");
+      tokens = Object.entries(ibmCarbon.spacing);
+      colorTokens = Object.entries(ibmCarbon.colors);
+      break;
+    case "Custom":
+      tokens = config.get<[string, number][]>("customSpacingTokens") || [];
+      colorTokens = config.get<[string, string][]>("customColorTokens") || [];
+      break;
+    default:
+      const defaultSystem = await import("./design-systems/default.json");
+      tokens = Object.entries(defaultSystem.spacing);
+      colorTokens = Object.entries(defaultSystem.colors);
+      break;
   }
 }
 

@@ -2,6 +2,9 @@
 
 All notable changes to the "Design System Linter" extension will be documented in this file.
 
+### [0.1.12]
+- Added native support for IBM Carbon Design System tokens
+
 ### [0.1.11]
 - Resolved an error that was including extraneous files in the extension package.
 
