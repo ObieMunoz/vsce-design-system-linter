@@ -66,13 +66,17 @@ function clearRecommendations(): void {
  * @param {number} value
  * @returns {string} The nearest token to the given value
  */
-function findNearestSpacingToken(value: number): string {
+function findNearestSpacingToken(
+  value: number,
+  unit: "px" | "rem" = "rem"
+): string {
   let minDiff = Number.MAX_VALUE;
   let nearestToken = "";
 
   for (const [token, tokenValue] of tokens) {
     if (typeof tokenValue === "number") {
-      const diff = Math.abs(tokenValue - value);
+      const tokenValueWithUnit = unit === "px" ? tokenValue * 16 : tokenValue;
+      const diff = Math.abs(tokenValueWithUnit - value);
       if (diff < minDiff) {
         minDiff = diff;
         nearestToken = token;
@@ -179,19 +183,27 @@ function handleSpacingValue(
   diagnostics: vscode.Diagnostic[],
   decorations: vscode.DecorationOptions[]
 ): void {
-  const pxValueString = match[2].trim();
-  const pxValues = pxValueString.match(/(\d+)px/g) || [];
+  const valueString = match[2].trim();
+  const values = valueString.match(/(\d+(?:\.\d+)?(?:px|rem))/g) || [];
 
-  pxValues.forEach((pxValue) => {
-    const value = parseInt(pxValue, 10);
+  values.forEach((valueWithUnit) => {
+    const unit = valueWithUnit.endsWith("px") ? "px" : "rem";
+    const value = parseFloat(valueWithUnit);
+
     const startPosition = document.positionAt(
-      (match.index ?? 0) + match[0].indexOf(pxValue)
+      (match.index ?? 0) + match[0].indexOf(valueWithUnit)
     );
-    const endPosition = startPosition.translate(0, pxValue.length);
+    const endPosition = startPosition.translate(0, valueWithUnit.length);
     const range = new vscode.Range(startPosition, endPosition);
 
-    const recommendation = findNearestSpacingToken(value / 16);
-    const message = `DESIGN SYSTEM: Consider using '${recommendation}' instead of '${pxValue}'.`;
+    let recommendation: string;
+    if (unit === "px") {
+      recommendation = findNearestSpacingToken(value / 16);
+    } else {
+      recommendation = findNearestSpacingToken(value);
+    }
+
+    const message = `DESIGN SYSTEM: Consider using '${recommendation}' instead of '${valueWithUnit}'.`;
 
     diagnostics.push(
       new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning)
@@ -297,8 +309,10 @@ function lintDocument(document: vscode.TextDocument): void {
 
   const text = document.getText();
 
-  // Match spacing values in px
-  const spacingRegex = /([\w-]+)\s*:\s*([\d\s]*(?:\d+px\b\s*)+)/g;
+  // Match spacing values in px or rem
+  const spacingRegex =
+    /([\w-]+)\s*:\s*([\d\s]*(?:\d+(?:\.\d+)?(?:px|rem)\b\s*)+)/g;
+
   // Match hex color values
   const colorRegex = /([\w-]+)\s*:\s*(#[0-9a-fA-F]{3,8})/g;
 
