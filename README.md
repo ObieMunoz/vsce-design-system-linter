@@ -4,40 +4,52 @@ Design System Linter is a powerful VSCode extension that helps you maintain cons
 
 ## Features
 
-### Built-in Default Tokens
+### Design System Selection
 
-Design System Linter comes with built-in default tokens for spacing and colors. To view the complete list of tokens, check the sections below:
+Design System Linter allows you to choose between built-in design systems or use a custom design system.
 
-- [Default Spacing Tokens](#default-spacing-tokens)
-- [Default Color Tokens](#default-color-tokens)
+To change the design system:
+1. Option 1: Open your VS Code Preferences and navigate to `Extensions` > `Design System Linter` > `Design System`. Once here, select the design system you would like to use.
+2. Option 2: Manually update the `designSystem` option in your `settings.json` file. The available options are:
 
-### Custom Tokens
-
-You can configure the extension to use your own tokens by modifying the settings.json options:
-
-- `design-system-linter.defaultSpacingTokens`
-- `design-system-linter.defaultColorTokens`
+- "default": The built-in default design system
+- "custom": Use a custom design system defined in your `settings.json`
 
 ### Token Warnings
 
-If a hex color is used that cannot be found in the default (or overridden) tokens, the following message will be displayed: _"⛝ Unsupported. Best match: ${nearestToken}"_
+If a hex color is used that cannot be found in the default (or overridden) tokens, the following message will be displayed: "⛝ Unsupported. Best match: ${nearestToken}"
 
 ## Getting Started
 
-1. **Installation**: Install the Design System Linter extension from the VSCode marketplace.
+1. **Installation**: Install the `Design System Linter` extension from the VSCode marketplace.
 2. **Enable/Disable**: The extension is enabled by default. To toggle its functionality, click the "Tokens" button in the status bar.
-3. **Configuration**: Navigate to `Preferences` > `Extensions` > `Design System Linter` to update the default tokens.
-4. **Reset**: To reset the extension's configuration tokens to their default values, open the command palette and select "Design System Linter: Reset Token Configuration".
+3. **Configuration**: Navigate to `Preferences` > `Extensions` > `Design System Linter` to select a design system or custom option.
+4. **Custom tokens**: To use custom tokens, update the `design-system-linter.customSpacingTokens` and `design-system-linter.customColorTokens` options in your `settings.json` file.
 
-### Updating Tokens
+## Design System Selection and Custom Options
+To use a different design system or define custom tokens, follow these steps:
 
-To modify the default tokens, select "Edit in settings.json" for the appropriate token group.
+1. Navigate to `Preferences` > `Extensions` > `Design System Linter`.
+2. Under the "Design System" option, select one of the predefined design systems or choose "Custom".
+3. If you selected "Custom", click "Edit in settings.json" next to the "Custom Design System" option.
+4. Define your custom tokens in the settings.json file using the following format:
 
-### Configuration Reset
-
-To reset the extension's configuration tokens to their default values, open the command palette and select "Design System Linter: Reset Token Configuration".
-
-## Token Listings
+```json
+  "design-system-linter.customSpacingTokens": [
+    ["$spacing-1", 4],
+    ["$spacing-2", 8],
+    ["$spacing-3", 12],
+    ["$spacing-4", 16],
+    // ... other tokens
+  ],
+  "design-system-linter.customColorTokens": [
+    ["$color-primary", "#1E90FF"],
+    ["$color-secondary", "#FF7F50"],
+    ["$color-success", "#32CD32"],
+    ["$color-warning", "#FFA07A"],
+    // ... other tokens
+  ]
+```
 
 ### Default Spacing Tokens
 

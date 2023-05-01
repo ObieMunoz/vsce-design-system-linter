@@ -2,6 +2,19 @@
 
 All notable changes to the "Design System Linter" extension will be documented in this file.
 
+### [0.1.10]
+#### Added
+- Added `designSystem` setting to allow users to select a predefined design system or use a custom design system.
+  - The currently available options are:
+    - "default": The built-in default design system
+    - "custom": Use a custom design system defined in your `settings.json`
+  - Introduced support for custom design system tokens:
+    - design-system-linter.customSpacingTokens for custom spacing tokens.
+    - design-system-linter.customColorTokens for custom color tokens.
+  - Updated README to include instructions for selecting a design system and utilizing a custom option.
+#### Changed
+- Refactored the code to handle the new design system selection functionality and load custom tokens when the "custom" option is selected.
+
 ### [0.1.9]
 - Minor updates to configuration and package files
 
