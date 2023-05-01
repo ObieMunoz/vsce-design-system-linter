@@ -1,12 +1,37 @@
 import * as vscode from "vscode";
 
 const config = vscode.workspace.getConfiguration("design-system-linter");
-
-const tokens = config.get<[string, number][]>("defaultSpacingTokens") || [];
-const colorTokens = config.get<[string, string][]>("defaultColorTokens") || [];
+const selectedDesignSystem = config.get<string>("designSystem") || "default";
 
 let isEnabled = true;
 let statusBarItem: vscode.StatusBarItem;
+let tokens: [string, number][];
+let colorTokens: [string, string][];
+
+/**
+ * @description Loads the selected design system
+ * @param {string} system The name of the design system to load
+ * @returns {Promise<void>}
+ */
+async function loadDesignSystem(system: string): Promise<void> {
+  try {
+    switch (system) {
+      case "default":
+        const designSystem = await import("./design-systems/default.json");
+        tokens = Object.entries(designSystem.default.spacing);
+        colorTokens = Object.entries(designSystem.default.colors);
+        break;
+      case "custom":
+        tokens = config.get<[string, number][]>("customSpacingTokens") || [];
+        colorTokens = config.get<[string, string][]>("customColorTokens") || [];
+        break;
+      default:
+        throw new Error(`Unsupported design system: ${system}`);
+    }
+  } catch (error: any) {
+    throw new Error(error);
+  }
+}
 
 /**
  * @description Activates the extension
@@ -250,15 +275,6 @@ function handleColorValue(
   }
 }
 
-let diagnosticCollection: vscode.DiagnosticCollection;
-
-const recommendationDecorationType =
-  vscode.window.createTextEditorDecorationType({
-    after: {
-      color: "rgba(255, 140, 0, 1)",
-    },
-  });
-
 /**
  * @description A linting function that performs regex matches on the document and calls the appropriate handler
  * @param {vscode.TextDocument} document
@@ -337,16 +353,6 @@ export function activate(context: vscode.ExtensionContext): void {
     lintDocument(vscode.window.activeTextEditor.document);
   }
 
-  // Register the reset configuration command
-  let resetConfigurationDisposable = vscode.commands.registerCommand(
-    "design-system-linter.resetConfiguration",
-    () => {
-      resetConfiguration();
-    }
-  );
-
-  context.subscriptions.push(resetConfigurationDisposable);
-
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor((editor) => {
       if (editor && isEnabled) {
@@ -376,30 +382,24 @@ export function activate(context: vscode.ExtensionContext): void {
       diagnosticCollection.delete(document.uri);
     })
   );
+
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration((event) => {
+      if (event.affectsConfiguration("design-system-linter.designSystem")) {
+        reloadExtension();
+      }
+    })
+  );
 }
 
 /**
- * @description This function will reset the configuration to the default values
+ * @description Reload the window when the user clicks the "Reload Window" button
  * @returns {void}
  */
-async function resetConfiguration(): Promise<void> {
-  const config = vscode.workspace.getConfiguration("design-system-linter");
-
-  config.update(
-    "defaultSpacingTokens",
-    undefined,
-    vscode.ConfigurationTarget.Global
-  );
-  config.update(
-    "defaultColorTokens",
-    undefined,
-    vscode.ConfigurationTarget.Global
-  );
-
-  // Show a message to inform the user that the configuration has been reset and ask them to reload the window
+async function reloadExtension(): Promise<void> {
   const reloadAction = "Reload Window";
   const result = await vscode.window.showInformationMessage(
-    "Design System Linter configuration has been reset to defaults. Please reload the window to apply the changes.",
+    "Design System Linter configuration has changed. Please reload the window to apply the changes.",
     reloadAction
   );
 
@@ -409,6 +409,21 @@ async function resetConfiguration(): Promise<void> {
   }
 }
 
-export function deactivate() {
+/**
+ * @description Called when extension is deactivated. Clears the diagnostic collection.
+ * @returns {void}
+ */
+export function deactivate(): void {
   diagnosticCollection.clear();
 }
+
+loadDesignSystem(selectedDesignSystem);
+
+let diagnosticCollection: vscode.DiagnosticCollection;
+
+const recommendationDecorationType =
+  vscode.window.createTextEditorDecorationType({
+    after: {
+      color: "rgba(255, 140, 0, 1)",
+    },
+  });
