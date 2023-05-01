@@ -1,6 +1,4 @@
 import * as vscode from "vscode";
-import ibmCarbon from "./design-systems/ibmcarbon.json";
-import defaultSystem from "./design-systems/default.json";
 
 const config = vscode.workspace.getConfiguration("design-system-linter");
 const selectedDesignSystem = config.get<string>("designSystem") || "default";
@@ -13,19 +11,21 @@ let colorTokens: [string, string][];
 /**
  * @description Loads the selected design system
  * @param {string} system The name of the design system to load
- * @returns {void}
+ * @returns {Promise<void>}
  */
-async function loadDesignSystem(system: string) {
+async function loadDesignSystem(system: string): Promise<void> {
   switch (system) {
-    case "ibmcarbon":
+    case "IBM Carbon":
+      const ibmCarbon = await import("./design-systems/ibmcarbon.json");
       tokens = Object.entries(ibmCarbon.spacing);
       colorTokens = Object.entries(ibmCarbon.colors);
       break;
-    case "custom":
+    case "Custom":
       tokens = config.get<[string, number][]>("customSpacingTokens") || [];
       colorTokens = config.get<[string, string][]>("customColorTokens") || [];
       break;
     default:
+      const defaultSystem = await import("./design-systems/default.json");
       tokens = Object.entries(defaultSystem.spacing);
       colorTokens = Object.entries(defaultSystem.colors);
       break;
