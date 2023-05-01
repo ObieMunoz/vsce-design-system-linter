@@ -2,6 +2,13 @@
 
 All notable changes to the "Design System Linter" extension will be documented in this file.
 
+### [0.1.15] - 2023-05-01
+#### Added
+- Support for floating-point values in spacing detection and recommendations. The extension can now handle both "px" and "rem" units with whole numbers or decimals (e.g., "1.25rem").
+
+#### Changed
+- Improved spacing detection and recommendation logic to accommodate floating-point values for both "px" and "rem" units.
+
 ### [0.1.14]
 - Added missing colors to IBM Carbon
 
