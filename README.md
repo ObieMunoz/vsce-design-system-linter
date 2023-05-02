@@ -2,14 +2,8 @@
 
 Design System Linter is a powerful VSCode extension that helps you maintain consistency and adhere to your design system guidelines while coding. By providing visual cues and warning messages for correct token usage, this extension eliminates the need to constantly consult your design system documentation, thereby enhancing your productivity.
 
-# Images
-## Demo
+# Demo
 ![Design System Linter Demo](assets/demo.gif)
-## Linter
-### Spacing Tokens
-![Design System Linter - Spacing](assets/lint-spacing.png)
-### Color Tokens
-![Design System Linter - Color](assets/lint-color.png)
 
 # Features
 
@@ -65,6 +59,18 @@ To use a different design system or define custom tokens, follow these steps:
   ]
 ```
 
+# Known Issues
+
+There are currently no known issues.
+
+
+# Images
+## Spacing Tokens & Warnings
+![Design System Linter - Spacing](assets/lint-spacing.png)
+## Color Tokens & Warnings
+![Design System Linter - Color](assets/lint-color.png)
+
+# Default Tokens
 ## Default Spacing Tokens
 
 | Token                | Value     |
@@ -171,7 +177,3 @@ To use a different design system or define custom tokens, follow these steps:
 | $color-support-warning-light                 | "#ffeecc" |
 | $color-support-success-base                  | "#006600" |
 | $color-support-success-light                 | "#d8ecb6" |
-
-# Known Issues
-
-There are currently no known issues.
