@@ -2,6 +2,10 @@
 
 All notable changes to the "Design System Linter" extension will be documented in this file.
 
+### [0.1.16] - 2023-05-02
+#### Changed
+- Updated README with a demo and images of the extension in action.
+
 ### [0.1.15] - 2023-05-01
 #### Added
 - Support for floating-point values in spacing detection and recommendations. The extension can now handle both "px" and "rem" units with whole numbers or decimals (e.g., "1.25rem").

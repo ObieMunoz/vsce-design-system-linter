@@ -2,9 +2,18 @@
 
 Design System Linter is a powerful VSCode extension that helps you maintain consistency and adhere to your design system guidelines while coding. By providing visual cues and warning messages for correct token usage, this extension eliminates the need to constantly consult your design system documentation, thereby enhancing your productivity.
 
-## Features
+# Images
+## Demo
+![Design System Linter Demo](assets/demo.gif)
+## Linter
+### Spacing Tokens
+![Design System Linter - Spacing](assets/lint-spacing.png)
+### Color Tokens
+![Design System Linter - Color](assets/lint-color.png)
 
-### Design System Selection
+# Features
+
+## Design System Selection
 
 Design System Linter allows you to choose between built-in design systems or use a custom design system.
 
@@ -16,18 +25,22 @@ To change the design system:
 - "IBM Carbon": The IBM Carbon Design System
 - "Custom": Use a custom design system defined in your `settings.json`
 
-### Token Warnings
+![Design System Linter - Settings](assets/settings-ds-selection.png)
+
+## Token Warnings
 
 If a hex color is used that cannot be found in the default (or overridden) tokens, the following message will be displayed: "⛝ Unsupported. Best match: ${nearestToken}"
 
-## Getting Started
+![Design System Linter - Color Unsupported](assets/lint-color-unsupported.png)
+
+# Getting Started
 
 1. **Installation**: Install the `Design System Linter` extension from the VSCode marketplace.
 2. **Enable/Disable**: The extension is enabled by default. To toggle its functionality, click the "Tokens" button in the status bar.
 3. **Configuration**: Navigate to `Preferences` > `Extensions` > `Design System Linter` to select a design system or custom option.
 4. **Custom tokens**: To use custom tokens, update the `design-system-linter.customSpacingTokens` and `design-system-linter.customColorTokens` options in your `settings.json` file.
 
-## Design System Selection and Custom Options
+# Design System Selection and Custom Options
 To use a different design system or define custom tokens, follow these steps:
 
 1. Navigate to `Preferences` > `Extensions` > `Design System Linter`.
@@ -52,7 +65,7 @@ To use a different design system or define custom tokens, follow these steps:
   ]
 ```
 
-### Default Spacing Tokens
+## Default Spacing Tokens
 
 | Token                | Value     |
 |----------------------|-----------|
@@ -92,7 +105,7 @@ To use a different design system or define custom tokens, follow these steps:
 | $breakpoint-lg       | 56.563rem |
 | $breakpoint-xl       | 77.5rem   |
 
-### Default Color Tokens
+## Default Color Tokens
 | Token                                        | Value     |
 |----------------------------------------------|-----------|
 | $color-base-gray-100                         | "#f2f2f2" |
@@ -159,6 +172,6 @@ To use a different design system or define custom tokens, follow these steps:
 | $color-support-success-base                  | "#006600" |
 | $color-support-success-light                 | "#d8ecb6" |
 
-## Known Issues
+# Known Issues
 
 There are currently no known issues.
