@@ -2,6 +2,10 @@
 
 All notable changes to the "Design System Linter" extension will be documented in this file.
 
+## [0.1.17] - 2023-05-12
+### Added
+- Implemented Code Actions to allow users to quickly fix linting errors.
+
 ## [0.1.16] - 2023-05-02
 ### Changed
 - Updated README with a demo and images of the extension in action.

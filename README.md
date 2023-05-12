@@ -59,11 +59,6 @@ To use a different design system or define custom tokens, follow these steps:
   ]
 ```
 
-# Known Issues
-
-There are currently no known issues.
-
-
 # Images
 ## Spacing Tokens & Warnings
 ![Design System Linter - Spacing](assets/lint-spacing.png)
