@@ -33,6 +33,49 @@ async function loadDesignSystem(system: string): Promise<void> {
 }
 
 /**
+ * @description Command to apply the recommendation
+ * @param {vscode.TextDocument} document
+ * @param {vscode.Range} range
+ * @param {string} recommendation
+ * @returns {Promise<void>}
+ */
+async function applyRecommendation(
+  document: vscode.TextDocument,
+  range: vscode.Range,
+  recommendation: string
+): Promise<void> {
+  const workspaceEdit = new vscode.WorkspaceEdit();
+  workspaceEdit.replace(document.uri, range, recommendation);
+  await vscode.workspace.applyEdit(workspaceEdit);
+}
+
+class RecommendationCodeActionProvider implements vscode.CodeActionProvider {
+  static readonly providedCodeActionKinds = [vscode.CodeActionKind.QuickFix];
+
+  provideCodeActions(
+    document: vscode.TextDocument,
+    _range: vscode.Range,
+    context: vscode.CodeActionContext,
+    _token: vscode.CancellationToken
+  ): vscode.ProviderResult<vscode.CodeAction[]> {
+    const diagnostic = context.diagnostics[0];
+    const recommendation = diagnostic.message.split("'")[1];
+    const action = new vscode.CodeAction(
+      `Apply recommendation: ${recommendation}`,
+      vscode.CodeActionKind.QuickFix
+    );
+    action.diagnostics = [diagnostic];
+    action.command = {
+      command: "tokenRecommendations.applyRecommendation",
+      title: "Apply Recommendation",
+      arguments: [document, diagnostic.range, `variables.${recommendation}`],
+    };
+    action.isPreferred = true;
+    return [action];
+  }
+}
+
+/**
  * @description Activates the extension
  * @returns {void}
  */
@@ -242,8 +285,10 @@ function handleColorValue(
     colorValue = `#${colorValue[1]}${colorValue[1]}${colorValue[2]}${colorValue[2]}${colorValue[3]}${colorValue[3]}`;
   }
 
-  const startPosition = document.positionAt(match.index ?? 0);
-  const endPosition = startPosition.translate(0, match[0].length);
+  const valueIndex =
+    (match.index ?? 0) + match[0].indexOf(colorValue.slice(0, 3));
+  const startPosition = document.positionAt(valueIndex);
+  const endPosition = startPosition.translate(0, colorValue.length);
   const range = new vscode.Range(startPosition, endPosition);
 
   const matchingTokens = findExactColorToken(colorValue);
@@ -269,7 +314,7 @@ function handleColorValue(
     decorations.push(decoration);
   } else {
     const nearestToken = findClosestColorToken(colorValue);
-    const message = `DESIGN SYSTEM: Consider using a token instead of '${colorValue}'.`;
+    const message = `DESIGN SYSTEM: Consider using '${nearestToken}' instead of '${colorValue}'.`;
     diagnostics.push(
       new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning)
     );
@@ -402,6 +447,24 @@ export function activate(context: vscode.ExtensionContext): void {
         reloadExtension();
       }
     })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "tokenRecommendations.applyRecommendation",
+      applyRecommendation
+    )
+  );
+
+  context.subscriptions.push(
+    vscode.languages.registerCodeActionsProvider(
+      ["css", "scss", "svelte"],
+      new RecommendationCodeActionProvider(),
+      {
+        providedCodeActionKinds:
+          RecommendationCodeActionProvider.providedCodeActionKinds,
+      }
+    )
   );
 }
 
