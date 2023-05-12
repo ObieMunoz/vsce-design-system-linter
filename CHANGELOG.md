@@ -2,6 +2,14 @@
 
 All notable changes to the "Design System Linter" extension will be documented in this file.
 
+## [0.1.18] - 2023-05-12
+### Added
+- Configuration section for token prefix
+
+### Changed
+- Removed hardcoded token prefix and allows users to specify a custom prefix in the extension settings.
+  - Defaults to "variables."
+
 ## [0.1.17] - 2023-05-12
 ### Added
 - Implemented Code Actions to allow users to quickly fix linting errors.

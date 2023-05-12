@@ -60,6 +60,7 @@ class RecommendationCodeActionProvider implements vscode.CodeActionProvider {
   ): vscode.ProviderResult<vscode.CodeAction[]> {
     const diagnostic = context.diagnostics[0];
     const recommendation = diagnostic.message.split("'")[1];
+    const tokenPrefix = config.get("tokenPrefix");
     const action = new vscode.CodeAction(
       `Apply recommendation: ${recommendation}`,
       vscode.CodeActionKind.QuickFix
@@ -68,7 +69,11 @@ class RecommendationCodeActionProvider implements vscode.CodeActionProvider {
     action.command = {
       command: "tokenRecommendations.applyRecommendation",
       title: "Apply Recommendation",
-      arguments: [document, diagnostic.range, `variables.${recommendation}`],
+      arguments: [
+        document,
+        diagnostic.range,
+        `${tokenPrefix}${recommendation}`,
+      ],
     };
     action.isPreferred = true;
     return [action];
