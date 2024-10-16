@@ -2,6 +2,10 @@
 
 All notable changes to the "Design System Linter" extension will be documented in this file.
 
+## [0.1.19] - 2024-10-16
+### Added
+- Added code to allow users to disable warnings for custom token settings.
+
 ## [0.1.18] - 2023-05-12
 ### Added
 - Configuration section for token prefix
