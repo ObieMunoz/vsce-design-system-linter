@@ -251,6 +251,10 @@ function handleSpacingValue(
       recommendation = findNearestSpacingToken(value);
     }
 
+    if(!recommendation) {
+      return;
+    }
+
     const message = `DESIGN SYSTEM: Consider using '${recommendation}' instead of '${valueWithUnit}'.`;
 
     diagnostics.push(
@@ -319,6 +323,10 @@ function handleColorValue(
     decorations.push(decoration);
   } else {
     const nearestToken = findClosestColorToken(colorValue);
+    if(!nearestToken) {
+      return;
+    }
+
     const message = `DESIGN SYSTEM: Consider using '${nearestToken}' instead of '${colorValue}'.`;
     diagnostics.push(
       new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning)
