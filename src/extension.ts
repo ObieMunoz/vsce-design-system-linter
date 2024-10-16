@@ -251,7 +251,7 @@ function handleSpacingValue(
       recommendation = findNearestSpacingToken(value);
     }
 
-    if(!recommendation) {
+    if (!recommendation) {
       return;
     }
 
@@ -323,7 +323,7 @@ function handleColorValue(
     decorations.push(decoration);
   } else {
     const nearestToken = findClosestColorToken(colorValue);
-    if(!nearestToken) {
+    if (!nearestToken) {
       return;
     }
 
