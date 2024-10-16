@@ -59,6 +59,13 @@ To use a different design system or define custom tokens, follow these steps:
   ]
 ```
 
+## Disable Warnings
+To disable warnings for either custom token setting, pass an empty array in settings.json:
+```json
+  "design-system-linter.customSpacingTokens": [],
+  "design-system-linter.customColorTokens": []
+```
+
 # Images
 ## Spacing Tokens & Warnings
 ![Design System Linter - Spacing](assets/lint-spacing.png)
