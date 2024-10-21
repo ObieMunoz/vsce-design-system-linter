@@ -2,9 +2,13 @@
 
 All notable changes to the "Design System Linter" extension will be documented in this file.
 
-## [0.1.19] - 2024-10-16
+## [0.2.0] - 2024-10-20
 ### Added
-- Added code to allow users to disable warnings for custom token settings.
+- Granular linting controls for spacing and colors.
+  - Users can now enable or disable linting for spacing and colors independently.
+  - This allows for more flexible use of the extension, especially when working with custom design systems.
+
+> Thanks to [mmason27](https://github.com/mmason27) for this suggested improvement.
 
 ## [0.1.18] - 2023-05-12
 ### Added
