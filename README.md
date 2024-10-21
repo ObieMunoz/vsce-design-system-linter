@@ -59,6 +59,22 @@ To use a different design system or define custom tokens, follow these steps:
   ]
 ```
 
+# Granular Linting Controls
+
+As of version 0.2.0, you can now enable or disable linting for spacing and colors independently. This allows for more flexible use of the extension, especially when working with custom design systems.
+
+To configure these options:
+
+1. Navigate to `Preferences` > `Extensions` > `Design System Linter`.
+2. Toggle the "Enable Spacing Lint" and "Enable Color Lint" options to enable or disable linting for spacing and colors, respectively.
+
+Alternatively, you can set these options in your `settings.json` file:
+
+```json
+  "design-system-linter.enableSpacingLint": true,
+  "design-system-linter.enableColorLint": true
+```
+
 # Images
 ## Spacing Tokens & Warnings
 ![Design System Linter - Spacing](assets/lint-spacing.png)
