@@ -2,6 +2,8 @@ import * as vscode from "vscode";
 
 const config = vscode.workspace.getConfiguration("design-system-linter");
 const selectedDesignSystem = config.get<string>("designSystem") || "default";
+const enableSpacingLint = config.get<boolean>("enableSpacingLint") ?? true;
+const enableColorLint = config.get<boolean>("enableColorLint") ?? true;
 
 let isEnabled = true;
 let statusBarItem: vscode.StatusBarItem;
@@ -251,10 +253,6 @@ function handleSpacingValue(
       recommendation = findNearestSpacingToken(value);
     }
 
-    if (!recommendation) {
-      return;
-    }
-
     const message = `DESIGN SYSTEM: Consider using '${recommendation}' instead of '${valueWithUnit}'.`;
 
     diagnostics.push(
@@ -323,9 +321,6 @@ function handleColorValue(
     decorations.push(decoration);
   } else {
     const nearestToken = findClosestColorToken(colorValue);
-    if (!nearestToken) {
-      return;
-    }
 
     const message = `DESIGN SYSTEM: Consider using '${nearestToken}' instead of '${colorValue}'.`;
     diagnostics.push(
@@ -367,23 +362,23 @@ function lintDocument(document: vscode.TextDocument): void {
 
   const text = document.getText();
 
-  // Match spacing values in px or rem
-  const spacingRegex =
-    /([\w-]+)\s*:\s*([\d\s]*(?:\d+(?:\.\d+)?(?:px|rem)\b\s*)+)/g;
-
-  // Match hex color values
-  const colorRegex = /([\w-]+)\s*:\s*(#[0-9a-fA-F]{3,8})/g;
-
   let match: RegExpExecArray | null;
 
   // Handle spacing values
-  while ((match = spacingRegex.exec(text)) !== null) {
-    handleSpacingValue(match, document, diagnostics, decorations);
+  if (enableSpacingLint) {
+    const spacingRegex =
+      /([\w-]+)\s*:\s*([\d\s]*(?:\d+(?:\.\d+)?(?:px|rem)\b\s*)+)/g;
+    while ((match = spacingRegex.exec(text)) !== null) {
+      handleSpacingValue(match, document, diagnostics, decorations);
+    }
   }
 
   // Handle color values
-  while ((match = colorRegex.exec(text)) !== null) {
-    handleColorValue(match, document, diagnostics, decorations);
+  if (enableColorLint) {
+    const colorRegex = /([\w-]+)\s*:\s*(#[0-9a-fA-F]{3,8})/g;
+    while ((match = colorRegex.exec(text)) !== null) {
+      handleColorValue(match, document, diagnostics, decorations);
+    }
   }
 
   diagnosticCollection.set(document.uri, diagnostics);
@@ -456,7 +451,19 @@ export function activate(context: vscode.ExtensionContext): void {
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((event) => {
-      if (event.affectsConfiguration("design-system-linter.designSystem")) {
+      const affectedSettings = [
+        "design-system-linter.designSystem",
+        "design-system-linter.enableSpacingLint",
+        "design-system-linter.enableColorLint",
+        "design-system-linter.customSpacingTokens",
+        "design-system-linter.customColorTokens",
+      ];
+
+      const shouldReload = affectedSettings.some((setting) =>
+        event.affectsConfiguration(setting)
+      );
+
+      if (shouldReload) {
         reloadExtension();
       }
     })
