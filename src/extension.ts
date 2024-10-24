@@ -56,13 +56,27 @@ class RecommendationCodeActionProvider implements vscode.CodeActionProvider {
 
   provideCodeActions(
     document: vscode.TextDocument,
-    _range: vscode.Range,
+    range: vscode.Range,
     context: vscode.CodeActionContext,
     _token: vscode.CancellationToken
   ): vscode.ProviderResult<vscode.CodeAction[]> {
+    if (context.diagnostics.length === 0) {
+      return [];
+    }
+
+    if (document.languageId === "svelte") {
+      const text = document.getText();
+      const offset = document.offsetAt(range.start);
+
+      if (!this.isWithinStyleTag(text, offset)) {
+        return [];
+      }
+    }
+
     const diagnostic = context.diagnostics[0];
     const recommendation = diagnostic.message.split("'")[1];
     const tokenPrefix = config.get("tokenPrefix");
+
     const action = new vscode.CodeAction(
       `Apply recommendation: ${recommendation}`,
       vscode.CodeActionKind.QuickFix
@@ -79,6 +93,22 @@ class RecommendationCodeActionProvider implements vscode.CodeActionProvider {
     };
     action.isPreferred = true;
     return [action];
+  }
+
+  private isWithinStyleTag(text: string, offset: number): boolean {
+    const styleTagRegex = /<style[^>]*>([\s\S]*?)<\/style>/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = styleTagRegex.exec(text)) !== null) {
+      const styleTagStart = match.index + match[0].indexOf(">") + 1;
+      const styleTagEnd = match.index + match[0].length - "</style>".length;
+
+      if (offset >= styleTagStart && offset <= styleTagEnd) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 
