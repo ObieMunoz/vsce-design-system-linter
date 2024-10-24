@@ -4,12 +4,15 @@
 </script>
 
 <main>
-  <h1>{title}</h1>
-  <p>{subtitle}</p>
+  <!-- Styles here should not be linted -->
+  <h1 style="color: #f618fa">{title}</h1>
+  <p style="margin-left: 20px">{subtitle}</p>
   <img src="https://via.placeholder.com/500" alt="Placeholder" />
 </main>
 
 <style>
+  /* Styles here will be linted */
+
   /* Reset styles */
   *,
   *::before,
