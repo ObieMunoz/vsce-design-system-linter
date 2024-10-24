@@ -2,6 +2,12 @@
 
 All notable changes to the "Design System Linter" extension will be documented in this file.
 
+
+## [0.2.1] - 2024-10-23
+### Changed
+- Updated the way Svelte files are parsed to ensure that the extension only lints the contents of the `<style>` tag.
+  - This does mean that in-line styles in Svelte files will not be linted by the extension.
+
 ## [0.2.0] - 2024-10-20
 ### Added
 - Granular linting controls for spacing and colors.

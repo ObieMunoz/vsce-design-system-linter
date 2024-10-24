@@ -56,13 +56,27 @@ class RecommendationCodeActionProvider implements vscode.CodeActionProvider {
 
   provideCodeActions(
     document: vscode.TextDocument,
-    _range: vscode.Range,
+    range: vscode.Range,
     context: vscode.CodeActionContext,
     _token: vscode.CancellationToken
   ): vscode.ProviderResult<vscode.CodeAction[]> {
+    if (context.diagnostics.length === 0) {
+      return [];
+    }
+
+    if (document.languageId === "svelte") {
+      const text = document.getText();
+      const offset = document.offsetAt(range.start);
+
+      if (!this.isWithinStyleTag(text, offset)) {
+        return [];
+      }
+    }
+
     const diagnostic = context.diagnostics[0];
     const recommendation = diagnostic.message.split("'")[1];
     const tokenPrefix = config.get("tokenPrefix");
+
     const action = new vscode.CodeAction(
       `Apply recommendation: ${recommendation}`,
       vscode.CodeActionKind.QuickFix
@@ -79,6 +93,22 @@ class RecommendationCodeActionProvider implements vscode.CodeActionProvider {
     };
     action.isPreferred = true;
     return [action];
+  }
+
+  private isWithinStyleTag(text: string, offset: number): boolean {
+    const styleTagRegex = /<style[^>]*>([\s\S]*?)<\/style>/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = styleTagRegex.exec(text)) !== null) {
+      const styleTagStart = match.index + match[0].indexOf(">") + 1;
+      const styleTagEnd = match.index + match[0].length - "</style>".length;
+
+      if (offset >= styleTagStart && offset <= styleTagEnd) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 
@@ -235,14 +265,18 @@ function handleSpacingValue(
 ): void {
   const valueString = match[2].trim();
   const values = valueString.match(/(\d+(?:\.\d+)?(?:px|rem))/g) || [];
+  const isSvelteFile = document.languageId === "svelte";
+  const fullText = document.getText();
 
   values.forEach((valueWithUnit) => {
     const unit = valueWithUnit.endsWith("px") ? "px" : "rem";
     const value = parseFloat(valueWithUnit);
 
-    const startPosition = document.positionAt(
-      (match.index ?? 0) + match[0].indexOf(valueWithUnit)
-    );
+    const valueOffset = (match.index ?? 0) + match[0].indexOf(valueWithUnit);
+    const adjustedOffset = isSvelteFile
+      ? adjustSveltePosition(valueOffset, fullText)
+      : valueOffset;
+    const startPosition = document.positionAt(adjustedOffset);
     const endPosition = startPosition.translate(0, valueWithUnit.length);
     const range = new vscode.Range(startPosition, endPosition);
 
@@ -254,7 +288,6 @@ function handleSpacingValue(
     }
 
     const message = `DESIGN SYSTEM: Consider using '${recommendation}' instead of '${valueWithUnit}'.`;
-
     diagnostics.push(
       new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning)
     );
@@ -267,7 +300,6 @@ function handleSpacingValue(
         },
       },
     };
-
     decorations.push(decoration);
   });
 }
@@ -287,14 +319,19 @@ function handleColorValue(
   decorations: vscode.DecorationOptions[]
 ): void {
   let colorValue = match[2].trim();
-
   if (colorValue.length === 4) {
     colorValue = `#${colorValue[1]}${colorValue[1]}${colorValue[2]}${colorValue[2]}${colorValue[3]}${colorValue[3]}`;
   }
 
-  const valueIndex =
+  const isSvelteFile = document.languageId === "svelte";
+  const fullText = document.getText();
+  const valueOffset =
     (match.index ?? 0) + match[0].indexOf(colorValue.slice(0, 3));
-  const startPosition = document.positionAt(valueIndex);
+  const adjustedOffset = isSvelteFile
+    ? adjustSveltePosition(valueOffset, fullText)
+    : valueOffset;
+
+  const startPosition = document.positionAt(adjustedOffset);
   const endPosition = startPosition.translate(0, colorValue.length);
   const range = new vscode.Range(startPosition, endPosition);
 
@@ -309,6 +346,7 @@ function handleColorValue(
     diagnostics.push(
       new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning)
     );
+
     const decoration: vscode.DecorationOptions = {
       range,
       renderOptions: {
@@ -317,15 +355,15 @@ function handleColorValue(
         },
       },
     };
-
     decorations.push(decoration);
   } else {
     const nearestToken = findClosestColorToken(colorValue);
-
     const message = `DESIGN SYSTEM: Consider using '${nearestToken}' instead of '${colorValue}'.`;
+
     diagnostics.push(
       new vscode.Diagnostic(range, message, vscode.DiagnosticSeverity.Warning)
     );
+
     const decoration: vscode.DecorationOptions = {
       range,
       renderOptions: {
@@ -334,7 +372,6 @@ function handleColorValue(
         },
       },
     };
-
     decorations.push(decoration);
   }
 }
@@ -360,7 +397,13 @@ function lintDocument(document: vscode.TextDocument): void {
   const diagnostics: vscode.Diagnostic[] = [];
   const decorations: vscode.DecorationOptions[] = [];
 
-  const text = document.getText();
+  let textToLint: string;
+
+  if (document.languageId === "svelte") {
+    textToLint = extractStyleTagContents(document.getText());
+  } else {
+    textToLint = document.getText();
+  }
 
   let match: RegExpExecArray | null;
 
@@ -368,7 +411,7 @@ function lintDocument(document: vscode.TextDocument): void {
   if (enableSpacingLint) {
     const spacingRegex =
       /([\w-]+)\s*:\s*([\d\s]*(?:\d+(?:\.\d+)?(?:px|rem)\b\s*)+)/g;
-    while ((match = spacingRegex.exec(text)) !== null) {
+    while ((match = spacingRegex.exec(textToLint)) !== null) {
       handleSpacingValue(match, document, diagnostics, decorations);
     }
   }
@@ -376,7 +419,7 @@ function lintDocument(document: vscode.TextDocument): void {
   // Handle color values
   if (enableColorLint) {
     const colorRegex = /([\w-]+)\s*:\s*(#[0-9a-fA-F]{3,8})/g;
-    while ((match = colorRegex.exec(text)) !== null) {
+    while ((match = colorRegex.exec(textToLint)) !== null) {
       handleColorValue(match, document, diagnostics, decorations);
     }
   }
@@ -386,6 +429,48 @@ function lintDocument(document: vscode.TextDocument): void {
   if (activeTextEditor && activeTextEditor.document.uri === document.uri) {
     activeTextEditor.setDecorations(recommendationDecorationType, decorations);
   }
+}
+
+/**
+ * @description Extracts contents of all style tags from a Svelte file
+ * @param {string} text - The full text content of the Svelte file
+ * @returns {string} Concatenated contents of all style tags
+ */
+function extractStyleTagContents(text: string): string {
+  const styleTagRegex = /<style[^>]*>([\s\S]*?)<\/style>/g;
+  let styleContents: string[] = [];
+  let match: RegExpExecArray | null;
+
+  while ((match = styleTagRegex.exec(text)) !== null) {
+    styleContents.push(match[1]);
+  }
+
+  return styleContents.join("\n");
+}
+
+/**
+ * @description Updates position information for diagnostics and decorations in Svelte files
+ * @param {number} offset - The offset within the style tag
+ * @param {string} fullText - The full document text
+ * @returns {number} The actual position in the document
+ */
+function adjustSveltePosition(offset: number, fullText: string): number {
+  const styleTagRegex = /<style[^>]*>([\s\S]*?)<\/style>/g;
+  let currentOffset = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = styleTagRegex.exec(fullText)) !== null) {
+    const styleContent = match[1];
+    const styleTagStart = match.index + match[0].indexOf(">") + 1;
+
+    if (currentOffset + styleContent.length >= offset) {
+      return styleTagStart + (offset - currentOffset);
+    }
+
+    currentOffset += styleContent.length + 1;
+  }
+
+  return offset;
 }
 
 /**
